@@ -1,0 +1,43 @@
+{
+    "manifest_version": 2,
+    "name": "My application",
+    "version": "0.1",
+
+    "icons": {
+        "16": "./16x16.png",
+        "32": "./32x32.png",
+        "48": "./48x48.png",
+        "128": "./128x128.png"
+    },
+
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "http://*/*",
+        "https://*/*",
+        "declarativeContent",
+        "storage"
+    ],
+
+    "background" : {
+        "page": "background.html"
+    },
+
+    "content_scripts":[{
+        "matches": [
+            "http://*/*",
+            "https://*/*"
+        ],
+        "js": [
+            "script_in_content.js"
+        ]
+    }],
+
+
+
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default_title": "Application",
+        "default_icon" : "./16x16.png"
+    }
+}

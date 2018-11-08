@@ -29,8 +29,13 @@
             "https://*/*"
         ],
         "js": [
+            "lib.js",
             "script_in_content.js"
-        ]
+        ],
+        "css": [
+            "css_in_content.css"
+        ],
+        "run_at": "document_end"
     }],
 
 

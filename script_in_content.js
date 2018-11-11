@@ -1,5 +1,9 @@
+/*
+*  vis - visibility
+* */
+
 const iconEye = '<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"\n' +
-	'\t viewBox="0 0 502.745 502.745" fill="#bcbcbc" style="width:15px;margin:7px;" xml:space="preserve">\n' +
+	'\t viewBox="0 0 502.745 502.745" fill="#bcbcbc" style="width:16px;height:16px;margin:7px;" xml:space="preserve">\n' +
 	'<g>\n' +
 	'\t<path d="M497.605,231.935C448.218,145.541,353.867,91.872,251.372,91.872S54.528,145.541,5.141,231.935\n' +
 	'\t\tc-6.854,11.989-6.854,26.886,0,38.875c49.387,86.394,143.738,140.063,246.232,140.063s196.845-53.669,246.232-140.063\n' +
@@ -22,22 +26,88 @@ const iconDesktop = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="
 
 const iconMobile = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>';
 
-window.onload = function(){
+window.onload = function () {
 	const element = document.getElementsByTagName("BODY")[0];
-	if(hasClass(element, 'admin-panel')){
+	if (hasClass(element, 'admin-panel')) {
+
+		/* + Проверка наличия стороннего кода приложения */
+		// const cssMeCodeBox = false; // Контроллер на необходимость создания нового стороннего кода (дял сохранения изменений)
+		const codeBox = document.getElementsByClassName('setting-post-insert-code');
+		if (codeBox.length){
+
+			function waitindTextareaLoad(){
+				const insertCode = document.getElementsByClassName('insert-code-content');
+
+				console.log(insertCode.length , codeBox.length);
+
+				if(insertCode.length > 0 && insertCode.length === codeBox.length){
+
+					console.log('insertCode load');
+
+					for (let i = 0; i < codeBox.length; i++) {
+						let textarea = insertCode[i].getElementsByTagName('textarea')[0].classList.add("js-cssMeTextarea");
+
+						//innerText.toLowerCase();
+						console.log(textarea);
+					}
+				} else { // Повторная попытка дождаться загрузки содержимого textarea
+
+					console.log('insertCode not load');
+
+					setTimeout(function(){waitindTextareaLoad()}, 1000)
+				}
+			}
+
+
+			waitindTextareaLoad();
+
+
+		}
+		/* - Проверка наличия стороннего кода приложения */
 
 		// Создаем кнопки
 		const widgetBox = document.getElementsByClassName("widget-control-panel");
-		console.log(widgetBox);
-		for(let i = 0; i < widgetBox.length; i++){
+		for (let i = 0; i < widgetBox.length; i++) {
 			const newEl = document.createElement('div');
-			newEl.innerHTML = iconEye + "<div class='cssMe__visibility-box'>" +
-				"<div class='cssMe__visibility-mobile'>"+iconMobile+"</div>" +
-				"<div class='cssMe__visibility-tablet'>"+iconTablet+"</div>" +
-				"<div class='cssMe__visibility-desktop'>"+iconDesktop+"</div>" +
+			newEl.innerHTML = "<div data-id='cmv" + i + "' class='js-cssMe-vis cssMe-vis'>" + iconEye + "</div><div id='cmv" + i + "' class='cssMe__vis-box cssMe__arrow-box js-cssMe-vis-box hide'>" +
+				"<div class='js-cssMe__vis-mobile cssMe__vis-mobile cssMe__vis-btn'>" + iconMobile + "</div>" +
+				"<div class='js-cssMe__vis-tablet cssMe__vis-tablet cssMe__vis-btn'>" + iconTablet + "</div>" +
+				"<div class='js-cssMe__vis-desktop cssMe__vis-desktop cssMe__vis-btn'>" + iconDesktop + "</div>" +
 				"</div>";
-			newEl.className = 'control js-cssMe-visibility';
+			newEl.className = 'control';
 			widgetBox[i].appendChild(newEl);
 		}
+
+		// Показываеи вызванные по клику кнопки
+		const jVis = document.getElementsByClassName("js-cssMe-vis");
+		for (let i = 0; i < jVis.length; i++) {
+			jVis[i].onclick = function () {
+				$(jVis[i].getAttribute("data-id")).classList.remove("hide");
+			};
+		}
+
+		// Прячем показанные кнопки выйдя за границы контейнера
+		const vBox = document.getElementsByClassName("js-cssMe-vis-box");
+		for (let i = 0; i < vBox.length; i++) {
+			vBox[i].onmouseleave = function () {
+				vBox[i].classList.add("hide");
+			}
+		}
+
+		// Клик по кнопке "мобильный"
+		const mBtn = document.getElementsByClassName("js-cssMe__vis-mobile");
+		for (let i = 0; i < mBtn.length; i++) {
+			mBtn[i].onclick = function () {
+				if(hasClass(mBtn[i], 'is-active')){
+					mBtn[i].classList.remove("is-active");
+				} else {
+					mBtn[i].classList.add("is-active");
+				}
+			};
+		}
+
 	}
 };
+
+
+

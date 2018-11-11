@@ -1,7 +1,73 @@
-.widget-control-panel {
-    display: block!important;
+.cssMe-vis {
+    height: 30px;
 }
 
-.cssMe__visibility-box {
+.cssMe__vis-box {
+    width: 142px;
+    margin-left: -57px;
+    display: flex;
+}
+
+.cssMe__vis-btn {
     background: #fff;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #cacaca;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.cssMe__vis-btn + .cssMe__vis-btn {
+    margin-left: -1px;
+}
+
+.cssMe__vis-btn:before {
+    content: '';
+    position: absolute;
+
+    transform: rotate(45deg);
+
+    border-right: 2px solid #000;
+    width: 1px;
+    height: 110%;
+    top: -3px;
+    left: 23px;
+    display: none;
+}
+
+.cssMe__vis-btn.is-active:before {
+    display: block;
+}
+
+.cssMe__arrow-box {
+    position: relative;
+    padding-top: 10px;
+}
+.cssMe__arrow-box:after, .arrow-box:before {
+    bottom: 100%;
+    left: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    margin-bottom: -11px;
+    z-index: 10;
+}
+
+.cssMe__arrow-box:after {
+    border-color: rgba(255, 255, 255, 0);
+    border-bottom-color: #fff;
+    border-width: 10px;
+    margin-left: -10px;
+}
+.cssMe__arrow-box:before {
+    border-color: rgba(202, 202, 202, 0);
+    border-bottom-color: #cacaca;
+    border-width: 11px;
+    margin-left: -11px;
 }

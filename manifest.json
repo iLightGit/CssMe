@@ -1,6 +1,6 @@
 {
     "manifest_version": 2,
-    "name": "My application",
+    "name": "CssMe",
     "version": "0.1",
 
     "icons": {

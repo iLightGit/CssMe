@@ -35,12 +35,12 @@ window.onload = function () {
 		const codeBox = document.getElementsByClassName('setting-post-insert-code');
 		if (codeBox.length){
 
-			function waitindTextareaLoad(){
+			function waitindTextareaLoad() {
 				const insertCode = document.getElementsByClassName('insert-code-content');
 
-				console.log(insertCode.length , codeBox.length);
+				console.log(insertCode.length, codeBox.length);
 
-				if(insertCode.length > 0 && insertCode.length === codeBox.length){
+				if (insertCode.length > 0 && insertCode.length === codeBox.length) {
 
 					console.log('insertCode load');
 
@@ -54,7 +54,9 @@ window.onload = function () {
 
 					console.log('insertCode not load');
 
-					setTimeout(function(){waitindTextareaLoad()}, 1000)
+					setTimeout(function () {
+						waitindTextareaLoad()
+					}, 1000)
 				}
 			}
 
@@ -82,7 +84,11 @@ window.onload = function () {
 		const jVis = document.getElementsByClassName("js-cssMe-vis");
 		for (let i = 0; i < jVis.length; i++) {
 			jVis[i].onclick = function () {
-				$(jVis[i].getAttribute("data-id")).classList.remove("hide");
+				if (document.getElementsByClassName('setting-post-insert-code').length) { // Проверяем есть ли на странице виджет 'Встроенный код'
+					$(jVis[i].getAttribute("data-id")).classList.remove("hide");
+				} else { // Временное решение, в дальнейшем можно интегрироваться со стороны проекта
+					alert("Не найдено ни одного виджета 'Встроенный код'. Пожалуйста добавьте виджет на страницу.");
+				}
 			};
 		}
 
@@ -98,7 +104,7 @@ window.onload = function () {
 		const mBtn = document.getElementsByClassName("js-cssMe__vis-mobile");
 		for (let i = 0; i < mBtn.length; i++) {
 			mBtn[i].onclick = function () {
-				if(hasClass(mBtn[i], 'is-active')){
+				if (hasClass(mBtn[i], 'is-active')) {
 					mBtn[i].classList.remove("is-active");
 				} else {
 					mBtn[i].classList.add("is-active");

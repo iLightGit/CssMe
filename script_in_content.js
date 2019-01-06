@@ -32,36 +32,73 @@ window.onload = function () {
 
 		/* + Проверка наличия стороннего кода приложения */
 		// const cssMeCodeBox = false; // Контроллер на необходимость создания нового стороннего кода (дял сохранения изменений)
-		const codeBox = document.getElementsByClassName('setting-post-insert-code');
-		if (codeBox.length){
+		const codeBox = document.getElementsByClassName('widget-post-insert-code');
+		if (codeBox.length) {
 
-			function waitindTextareaLoad() {
+			function waitingWidgetLoad() {
+
 				const insertCode = document.getElementsByClassName('insert-code-content');
-
-				console.log(insertCode.length, codeBox.length);
-
 				if (insertCode.length > 0 && insertCode.length === codeBox.length) {
 
 					console.log('insertCode load');
 
 					for (let i = 0; i < codeBox.length; i++) {
-						let textarea = insertCode[i].getElementsByTagName('textarea')[0].classList.add("js-cssMeTextarea");
+						let textarea = codeBox[i].getElementsByTagName('textarea')[0];
 
+						//textarea.classList.add("js-cssMeTextarea");
 						//innerText.toLowerCase();
-						console.log(textarea);
+
+						// Логика открытия-закрытия виджета сторонний код, может быть переделана под получение содержимого напрямую
+						const elem = codeBox[i].getElementsByClassName('addcode')[0];
+						elem.click(); // Открвает виджет сторонний код, чтобы подгрузить его содержимое
+
+						const closeSettings = codeBox[i].getElementsByClassName('b-cancel')[0];
+						closeSettings.click(); // Закрываем виджет сторонний код.
+
+						if (textarea.value !== '') {
+							parseTextarea(textarea.value);
+						}
+
 					}
-				} else { // Повторная попытка дождаться загрузки содержимого textarea
+				} else { // Повторная попытка дождаться загрузки содержимого виджета сторонний код
 
 					console.log('insertCode not load');
 
 					setTimeout(function () {
-						waitindTextareaLoad()
+						waitingWidgetLoad()
 					}, 1000)
+				}
+
+				function parseTextarea(val) {
+					const check = val.search("cssMePlease");
+
+					if (check !== -1) { // проверяем наличие в виджете специального комментария (что виджет для работы расширения)
+						let cssarray = val.split('\n');
+
+						for (let i = 0; i < cssarray.length; i++) {
+							const checkArrayEl = cssarray[i].search('#'); // отсекаем только эл-ты текста содержащие id
+
+							if (checkArrayEl !== -1) {
+								const cssarray2 = cssarray[i].split(' ');
+
+								if (cssarray2.length === 3) {
+									const id = '#element_' + cssarray2[1].split('_')[1];
+									const adaptive = '.js-cssMe__vis-' + cssarray2[0].split('-')[1];
+
+									document.querySelector(id + ' ' + adaptive).classList.add("is-active");
+								}
+							}
+						}
+
+					} else {
+						// console.error(val);
+					}
+
 				}
 			}
 
 
-			waitindTextareaLoad();
+			waitingWidgetLoad();
 
 
 		}

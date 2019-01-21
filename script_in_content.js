@@ -105,16 +105,20 @@ window.onload = function () {
 		/* - Проверка наличия стороннего кода приложения */
 
 		// Создаем кнопки
-		const widgetBox = document.getElementsByClassName("widget-control-panel");
-		for (let i = 0; i < widgetBox.length; i++) {
+		const widgetControlPanel = document.getElementsByClassName("widget-control-panel");
+		const widget = document.getElementsByClassName("element-box"); // Тут возможно проблемы с неймингом
+
+		for (let i = 0; i < widget.length; i++) {
 			const newEl = document.createElement('div');
-			newEl.innerHTML = "<div data-id='cmv" + i + "' class='js-cssMe-vis cssMe-vis'>" + iconEye + "</div><div id='cmv" + i + "' class='cssMe__vis-box cssMe__arrow-box js-cssMe-vis-box hide'>" +
-				"<div class='js-cssMe__vis-mobile cssMe__vis-mobile cssMe__vis-btn'>" + iconMobile + "</div>" +
-				"<div class='js-cssMe__vis-tablet cssMe__vis-tablet cssMe__vis-btn'>" + iconTablet + "</div>" +
-				"<div class='js-cssMe__vis-desktop cssMe__vis-desktop cssMe__vis-btn'>" + iconDesktop + "</div>" +
+
+			newEl.innerHTML = "<div data-id='cmv" + i + "' class='js-cssMe-vis cssMe-vis'>" + iconEye + "</div>" +
+				"<div data-id='"+widget[i].getAttribute("data-id")+"' id='cmv" + i + "' class='cssMe__vis-box cssMe__arrow-box js-cssMe-vis-box hide'>" +
+					"<div data-type='mobile' class='js-cssMe__vis-mobile cssMe__vis-mobile cssMe__vis-btn'>" + iconMobile + "</div>" +
+					"<div data-type='tablet' class='js-cssMe__vis-tablet cssMe__vis-tablet cssMe__vis-btn'>" + iconTablet + "</div>" +
+					"<div data-type='desktop' class='js-cssMe__vis-desktop cssMe__vis-desktop cssMe__vis-btn'>" + iconDesktop + "</div>" +
 				"</div>";
 			newEl.className = 'control';
-			widgetBox[i].appendChild(newEl);
+			widgetControlPanel[i].appendChild(newEl);
 		}
 
 		// Показываеи вызванные по клику кнопки
@@ -145,8 +149,17 @@ window.onload = function () {
 					mBtn[i].classList.remove("is-active");
 				} else {
 					mBtn[i].classList.add("is-active");
+					generateNewCode(mBtn[i], 'mobile');
 				}
 			};
+		}
+
+		// Генерируем новый код
+		function generateNewCode(btnId, type) {
+			const id = btnId.closest('.js-cssMe-vis-box').getAttribute("data-id");
+			// const type = btnId.getAttribute("data-type");
+
+			console.log('.adaptive-' + type +' #widget_' + id + ' {display:none;}');
 		}
 
 	}

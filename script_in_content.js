@@ -28,81 +28,82 @@ const iconMobile = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="2
 
 window.onload = function () {
 	const element = document.getElementsByTagName("BODY")[0];
+	let cssMeTextarea;
+
 	if (hasClass(element, 'admin-panel')) {
 
 		/* + Проверка наличия стороннего кода приложения */
-		// const cssMeCodeBox = false; // Контроллер на необходимость создания нового стороннего кода (дял сохранения изменений)
 		const codeBox = document.getElementsByClassName('widget-post-insert-code');
+
 		if (codeBox.length) {
+			initWidgetInsertCode();
+		}
 
-			function waitingWidgetLoad() {
+		function initWidgetInsertCode() {
 
-				const insertCode = document.getElementsByClassName('insert-code-content');
-				if (insertCode.length > 0 && insertCode.length === codeBox.length) {
+			const insertCode = document.getElementsByClassName('insert-code-content');
+			if (insertCode.length > 0 && insertCode.length === codeBox.length) {
 
-					console.log('insertCode load');
+				console.log('insertCode load');
 
-					for (let i = 0; i < codeBox.length; i++) {
-						let textarea = codeBox[i].getElementsByTagName('textarea')[0];
+				for (let i = 0; i < codeBox.length; i++) {
+					cssMeTextarea = codeBox[i].getElementsByTagName('textarea')[0];
 
-						//textarea.classList.add("js-cssMeTextarea");
-						//innerText.toLowerCase();
+					// Логика открытия-закрытия виджета сторонний код, может быть переделана под получение содержимого напрямую
+					const elem = codeBox[i].getElementsByClassName('addcode')[0];
+					elem.click(); // Открвает виджет сторонний код, чтобы подгрузить его содержимое
 
-						// Логика открытия-закрытия виджета сторонний код, может быть переделана под получение содержимого напрямую
-						const elem = codeBox[i].getElementsByClassName('addcode')[0];
-						elem.click(); // Открвает виджет сторонний код, чтобы подгрузить его содержимое
+					const closeSettings = codeBox[i].getElementsByClassName('b-cancel')[0];
+					closeSettings.click(); // Закрываем виджет сторонний код.
 
-						const closeSettings = codeBox[i].getElementsByClassName('b-cancel')[0];
-						closeSettings.click(); // Закрываем виджет сторонний код.
-
-						if (textarea.value !== '') {
-							parseTextarea(textarea.value);
-						}
-
-					}
-				} else { // Повторная попытка дождаться загрузки содержимого виджета сторонний код
-
-					console.log('insertCode not load');
-
-					setTimeout(function () {
-						waitingWidgetLoad()
-					}, 1000)
-				}
-
-				function parseTextarea(val) {
-					const check = val.search("cssMePlease");
-
-					if (check !== -1) { // проверяем наличие в виджете специального комментария (что виджет для работы расширения)
-						let cssarray = val.split('\n');
-
-						for (let i = 0; i < cssarray.length; i++) {
-							const checkArrayEl = cssarray[i].search('#'); // отсекаем только эл-ты текста содержащие id
-
-							if (checkArrayEl !== -1) {
-								const cssarray2 = cssarray[i].split(' ');
-
-								if (cssarray2.length === 3) {
-									const id = '#element_' + cssarray2[1].split('_')[1];
-									const adaptive = '.js-cssMe__vis-' + cssarray2[0].split('-')[1];
-
-									document.querySelector(id + ' ' + adaptive).classList.add("is-active");
-								}
-							}
-						}
-
-					} else {
-						// console.error(val);
+					if (cssMeTextarea.value !== '') {
+						parseTextarea(cssMeTextarea.value);
 					}
 
 				}
+			} else { // Повторная попытка дождаться загрузки содержимого виджета сторонний код
+
+				console.log('insertCode not load');
+
+				setTimeout(function () {
+					initWidgetInsertCode()
+				}, 1000)
 			}
 
+			function parseTextarea(val) {
+				const checkCssMeTextarea = hasCssMeTextarea (val);
 
-			waitingWidgetLoad();
+				if (checkCssMeTextarea !== -1) { // проверяем наличие в виджете специального комментария (что виджет для работы расширения)
+					let cssArray = val.split('\n');
 
+					for (let i = 0; i < cssArray.length; i++) {
+						const checkArrayEl = cssArray[i].search('#'); // отсекаем только эл-ты текста содержащие id
 
+						if (checkArrayEl !== -1) {
+							const cssArray2 = cssArray[i].split(' ');
+
+							if (cssArray2.length === 3) {
+								const id = '#element_' + cssArray2[1].split('_')[1];
+								const adaptive = '.js-cssMe__vis-' + cssArray2[0].split('-')[1];
+
+								document.querySelector(id + ' ' + adaptive).classList.add("is-active");
+							}
+						}
+					}
+
+				} else {
+					// console.error(val);
+				}
+
+			}
 		}
+
 		/* - Проверка наличия стороннего кода приложения */
+
+		// Проверка наличия задействонного расширением виджета
+		function hasCssMeTextarea (val) {
+			return val.search("cssMePlease");
+		}
 
 		// Создаем кнопки
 		const widgetControlPanel = document.getElementsByClassName("widget-control-panel");
@@ -125,10 +126,30 @@ window.onload = function () {
 		const jVis = document.getElementsByClassName("js-cssMe-vis");
 		for (let i = 0; i < jVis.length; i++) {
 			jVis[i].onclick = function () {
-				if (document.getElementsByClassName('setting-post-insert-code').length) { // Проверяем есть ли на странице виджет 'Встроенный код'
-					$(jVis[i].getAttribute("data-id")).classList.remove("hide");
-				} else { // Временное решение, в дальнейшем можно интегрироваться со стороны проекта
-					alert("Не найдено ни одного виджета 'Встроенный код'. Пожалуйста добавьте виджет на страницу.");
+				console.log(jVis[i], 'click');
+				let controllerPIC = false; // Контроллер наличия подходящего "виджета сторонний код"
+				const checkPICMass = document.getElementsByClassName('setting-post-insert-code');
+				const lenghtPICMass = checkPICMass.length;
+				let counterPICMass = 0;
+
+				if(lenghtPICMass) {
+					for (counterPICMass; counterPICMass<lenghtPICMass;counterPICMass++){
+						const tAreaVal =  checkPICMass[counterPICMass].getElementsByTagName('textarea')[0].value;
+						if( tAreaVal === ''){
+							controllerPIC = true;
+						} else {
+							const checkCssMeTextarea = hasCssMeTextarea (tAreaVal);
+							if( checkCssMeTextarea !== -1){
+								controllerPIC = true;
+							}
+						}
+					}
+				}
+
+				if (controllerPIC) { // Проверяем есть ли на странице виджет 'Встроенный код'
+					$(jVis[i].getAttribute("data-id")).classList.remove("hide"); // Усешный кейс, показываем панель с кнопками видимости
+				} else { // Временное решение, в дальнейшем возможна интеграция со стороны проекта, либо более красивая реализация
+					alert("Не найдено ни одного подходящего виджета 'Встроенный код'. Пожалуйста добавьте пустой виджет на страницу.");
 				}
 			};
 		}
@@ -142,24 +163,36 @@ window.onload = function () {
 		}
 
 		// Клик по кнопке "мобильный"
-		const mBtn = document.getElementsByClassName("js-cssMe__vis-mobile");
+		const mBtn = document.querySelectorAll('[class*="js-cssMe__vis-"]');
 		for (let i = 0; i < mBtn.length; i++) {
 			mBtn[i].onclick = function () {
 				if (hasClass(mBtn[i], 'is-active')) {
 					mBtn[i].classList.remove("is-active");
 				} else {
 					mBtn[i].classList.add("is-active");
-					generateNewCode(mBtn[i], 'mobile');
+					generateNewCode(mBtn[i]);
 				}
 			};
 		}
 
 		// Генерируем новый код
-		function generateNewCode(btnId, type) {
+		function generateNewCode(btnId) {
 			const id = btnId.closest('.js-cssMe-vis-box').getAttribute("data-id");
-			// const type = btnId.getAttribute("data-type");
+			const type = btnId.getAttribute("data-type");
+			const generatedText = '.adaptive-' + type +' #widget_' + id + ' {display:none;}\n';
 
-			console.log('.adaptive-' + type +' #widget_' + id + ' {display:none;}');
+			if(cssMeTextarea === undefined){
+				initWidgetInsertCode();
+			}
+
+			if(cssMeTextarea.value === ''){ // Первичная генерация
+				cssMeTextarea.value = '<style>\/*cssMePlease*\/\n' + generatedText + '</style>';
+			} else { // К старому добавляем новый
+				const textMassiv = cssMeTextarea.value.split('</style>');
+
+				cssMeTextarea.value = textMassiv[0] + generatedText + '</style>';
+			}
+			console.log(cssMeTextarea.value);
 		}
 
 	}

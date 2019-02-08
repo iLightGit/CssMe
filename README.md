@@ -1,4 +1,4 @@
 CssMe extention
 ================
 
-by iLightGit & KrazhauRaman
+by iLightGit

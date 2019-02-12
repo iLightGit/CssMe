@@ -48,7 +48,7 @@ window.onload = function () {
 
 				for (let i = 0; i < codeBox.length; i++) {
 					cssMeTextarea = codeBox[i].getElementsByTagName('textarea')[0];
-
+					cssMeTextarea.id = 'textarea_' + codeBox[i].id.split('_')[1];
 					// Логика открытия-закрытия виджета сторонний код, может быть переделана под получение содержимого напрямую
 					const elem = codeBox[i].getElementsByClassName('addcode')[0];
 					elem.click(); // Открвает виджет сторонний код, чтобы подгрузить его содержимое
@@ -192,7 +192,14 @@ window.onload = function () {
 
 				cssMeTextarea.value = textMassiv[0] + generatedText + '</style>';
 			}
-			console.log(cssMeTextarea.value);
+			
+			document.dispatchEvent(new CustomEvent('build', {
+				bubbles: true,
+				detail: {
+					textarea_id: cssMeTextarea.id
+				}
+			}));
+
 		}
 
 	}

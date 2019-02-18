@@ -168,15 +168,16 @@ window.onload = function () {
 			mBtn[i].onclick = function () {
 				if (hasClass(mBtn[i], 'is-active')) {
 					mBtn[i].classList.remove("is-active");
+					generateNewCode(mBtn[i], false);
 				} else {
 					mBtn[i].classList.add("is-active");
-					generateNewCode(mBtn[i]);
+					generateNewCode(mBtn[i], true);
 				}
 			};
 		}
 
 		// Генерируем новый код
-		function generateNewCode(btnId) {
+		function generateNewCode(btnId, addController) {
 			const id = btnId.closest('.js-cssMe-vis-box').getAttribute("data-id");
 			const type = btnId.getAttribute("data-type");
 			const generatedText = '.adaptive-' + type +' #widget_' + id + ' {display:none;}\n';
@@ -185,15 +186,20 @@ window.onload = function () {
 				initWidgetInsertCode();
 			}
 
-			if(cssMeTextarea.value === ''){ // Первичная генерация
-				cssMeTextarea.value = '<style>\/*cssMePlease*\/\n' + generatedText + '</style>';
-			} else { // К старому добавляем новый
-				const textMassiv = cssMeTextarea.value.split('</style>');
+			if(addController){ // Добавление
+				if(cssMeTextarea.value === ''){ // Первичная генерация
+					cssMeTextarea.value = '<style>\/*cssMePlease*\/\n' + generatedText + '</style>';
+				} else { // К старому добавляем новый
+					const textMassiv = cssMeTextarea.value.split('</style>');
 
-				cssMeTextarea.value = textMassiv[0] + generatedText + '</style>';
+					cssMeTextarea.value = textMassiv[0] + generatedText + '</style>';
+				}
+			} else { // Удаление
+				const textMassiv = cssMeTextarea.value.split(generatedText);
+				cssMeTextarea.value = textMassiv[0] + textMassiv[1];
 			}
-			
-			document.dispatchEvent(new CustomEvent('build', {
+
+			document.dispatchEvent(new CustomEvent('updateInsertCode', {
 				bubbles: true,
 				detail: {
 					textarea_id: cssMeTextarea.id

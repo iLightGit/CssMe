@@ -124,9 +124,11 @@ window.onload = function () {
 
 		// Показываеи вызванные по клику кнопки
 		const jVis = document.getElementsByClassName("js-cssMe-vis");
+
 		for (let i = 0; i < jVis.length; i++) {
+
 			jVis[i].onclick = function () {
-				console.log(jVis[i], 'click');
+
 				let controllerPIC = false; // Контроллер наличия подходящего "виджета сторонний код"
 				const checkPICMass = document.getElementsByClassName('setting-post-insert-code');
 				const lenghtPICMass = checkPICMass.length;
@@ -148,8 +150,10 @@ window.onload = function () {
 
 				if (controllerPIC) { // Проверяем есть ли на странице виджет 'Встроенный код'
 					$(jVis[i].getAttribute("data-id")).classList.remove("hide"); // Усешный кейс, показываем панель с кнопками видимости
-				} else { // Временное решение, в дальнейшем возможна интеграция со стороны проекта, либо более красивая реализация
-					alert("Не найдено ни одного подходящего виджета 'Встроенный код'. Пожалуйста добавьте пустой виджет на страницу.");
+				} else { // Если нет, создаем новый
+					document.dispatchEvent(new CustomEvent('createNewInsertCode', {
+						bubbles: true,
+					}));
 				}
 			};
 		}

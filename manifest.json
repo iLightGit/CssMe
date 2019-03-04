@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "CssMe",
-    "version": "0.7",
+    "version": "0.8",
 
     "icons": {
         "16": "./16x16.png",
@@ -41,8 +41,8 @@
 
 
     "browser_action": {
-        "default_popup": "popup.html",
-        "default_title": "Application",
+        /*"default_popup": "popup.html",*/
+        "default_title": "cssMe.Vigbo",
         "default_icon" : "./16x16.png"
     }
 }

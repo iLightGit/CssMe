@@ -39,65 +39,86 @@ window.onload = function () {
 			initWidgetInsertCode();
 		}
 
+		// Проверяем все виджеты сторонний код на наличие менки
 		function initWidgetInsertCode() {
 
 			const insertCode = document.getElementsByClassName('insert-code-content');
 			if (insertCode.length > 0 && insertCode.length === codeBox.length) {
 
-				console.log('insertCode load');
-
+				let eachTextarea;
 				for (let i = 0; i < codeBox.length; i++) {
-					cssMeTextarea = codeBox[i].getElementsByTagName('textarea')[0];
-					cssMeTextarea.id = 'textarea_' + codeBox[i].id.split('_')[1];
-					// Логика открытия-закрытия виджета сторонний код, может быть переделана под получение содержимого напрямую
-					const elem = codeBox[i].getElementsByClassName('addcode')[0];
-					elem.click(); // Открвает виджет сторонний код, чтобы подгрузить его содержимое
+					eachTextarea = codeBox[i].getElementsByTagName('textarea')[0];
 
-					const closeSettings = codeBox[i].getElementsByClassName('b-cancel')[0];
-					closeSettings.click(); // Закрываем виджет сторонний код.
+					getTextareaAccess(codeBox[i]);
 
-					if (cssMeTextarea.value !== '') {
-						parseTextarea(cssMeTextarea.value);
+					const checkCssMeTextarea = hasCssMeTextarea (eachTextarea.value);
+					if (checkCssMeTextarea !== -1) {
+						parseTextarea(eachTextarea, codeBox[i]);
+						// выйти из цмкла
 					}
 
 				}
 			} else { // Повторная попытка дождаться загрузки содержимого виджета сторонний код
 
-				console.log('insertCode not load');
+				console.info('insertCode load waiting...');
 
 				setTimeout(function () {
 					initWidgetInsertCode()
 				}, 1000)
 			}
 
-			function parseTextarea(val) {
-				const checkCssMeTextarea = hasCssMeTextarea (val);
+			function parseTextarea(eachTextarea, codeBox) {
+				const val = eachTextarea.value;
+				let cssArray = val.split('\n');
+				console.log(codeBox);
 
-				if (checkCssMeTextarea !== -1) { // проверяем наличие в виджете специального комментария (что виджет для работы расширения)
-					let cssArray = val.split('\n');
+				cssMeTextarea = eachTextarea;
+				cssMeTextarea.id = 'textarea_' + codeBox.id.split('_')[1];
 
-					for (let i = 0; i < cssArray.length; i++) {
-						const checkArrayEl = cssArray[i].search('#'); // отсекаем только эл-ты текста содержащие id
+				for (let i = 0; i < cssArray.length; i++) {
+					const checkArrayEl = cssArray[i].search('#'); // отсекаем только эл-ты текста содержащие id
 
-						if (checkArrayEl !== -1) {
-							const cssArray2 = cssArray[i].split(' ');
+					if (checkArrayEl !== -1) {
+						const cssArray2 = cssArray[i].split(' ');
 
-							if (cssArray2.length === 3) {
-								const id = '#element_' + cssArray2[1].split('_')[1];
-								const adaptive = '.js-cssMe__vis-' + cssArray2[0].split('-')[1];
+						if (cssArray2.length === 3) {
+							const id = '#element_' + cssArray2[1].split('_')[1];
+							const adaptive = '.js-cssMe__vis-' + cssArray2[0].split('-')[1];
 
-								document.querySelector(id + ' ' + adaptive).classList.add("is-active");
-							}
+							document.querySelector(id + ' ' + adaptive).classList.add("is-active");
 						}
 					}
-
-				} else {
-					// console.error(val);
 				}
 
 			}
 		}
 
+		// Открываем и закрываем "сторонний код", чтобы получить доступ к его содержимомк
+		function getTextareaAccess(box){
+			// Логика открытия-закрытия виджета сторонний код, может быть переделана под получение содержимого напрямую
+			const elem = box.getElementsByClassName('addcode')[0];
+			elem.click(); // Открвает виджет сторонний код, чтобы подгрузить его содержимое
+			const closeSettings = box.getElementsByClassName('b-cancel')[0];
+			closeSettings.click(); // Закрываем виджет сторонний код.
+		}
+
+		// Инициализируем только что созданный "сторонний код"
+		function initNewWidgetInsertCode (){
+			const newInitCodeBox = document.getElementsByClassName('widget-post-insert-code')[0];
+			const newInitTeaxtarea = newInitCodeBox.getElementsByTagName('textarea')[0];
+
+			getTextareaAccess(newInitCodeBox);
+			cssMeTextarea = newInitTeaxtarea;
+			cssMeTextarea.id = 'textarea_' + newInitCodeBox.id.split('_')[1];
+			firstTeaxtareaValueGenegate(''); // Добавляем метку
+			console.log('initNewWidgetInsertCode', cssMeTextarea.id, cssMeTextarea.value);
+			document.dispatchEvent(new CustomEvent('updateInsertCode', {
+				bubbles: true,
+				detail: {
+					textarea_id: 'element_' + cssMeTextarea.id.split('_')[1]
+				}
+			}));
+		}
 		/* - Проверка наличия стороннего кода приложения */
 
 		// Проверка наличия задействонного расширением виджета
@@ -122,7 +143,7 @@ window.onload = function () {
 			widgetControlPanel[i].appendChild(newEl);
 		}
 
-		// Показываеи вызванные по клику кнопки
+		// Показываем вызванные по клику кнопки (иконка "глазик")
 		const jVis = document.getElementsByClassName("js-cssMe-vis");
 
 		for (let i = 0; i < jVis.length; i++) {
@@ -131,43 +152,61 @@ window.onload = function () {
 
 				let controllerPIC = false; // Контроллер наличия подходящего "виджета сторонний код"
 				const checkPICMass = document.getElementsByClassName('setting-post-insert-code');
-				const lenghtPICMass = checkPICMass.length;
+				const lengthPICMass = checkPICMass.length;
 				let counterPICMass = 0;
 
-				if(lenghtPICMass) {
-					for (counterPICMass; counterPICMass<lenghtPICMass;counterPICMass++){
+				if(lengthPICMass) {
+					for (counterPICMass; counterPICMass<lengthPICMass; counterPICMass++){
 						const tAreaVal =  checkPICMass[counterPICMass].getElementsByTagName('textarea')[0].value;
-						if( tAreaVal === ''){
-							controllerPIC = true;
-						} else {
+						// if( tAreaVal === ''){
+						// 	controllerPIC = true;
+						// } else {
 							const checkCssMeTextarea = hasCssMeTextarea (tAreaVal);
 							if( checkCssMeTextarea !== -1){
 								controllerPIC = true;
 							}
-						}
+						// }
 					}
 				}
 
-				if (controllerPIC) { // Проверяем есть ли на странице виджет 'Встроенный код'
+				// Проверяем есть ли на странице подходящий виджет 'Встроенный код'
+				if (controllerPIC) {
 					$(jVis[i].getAttribute("data-id")).classList.remove("hide"); // Усешный кейс, показываем панель с кнопками видимости
 				} else { // Если нет, создаем новый
+					console.log('new widget', );
+					let teaxtareaStartCount = codeBox.length;
 					document.dispatchEvent(new CustomEvent('createNewInsertCode', {
 						bubbles: true,
 					}));
+					checkAppendNewTextarea();
+
+					function checkAppendNewTextarea(){
+						//console.log(teaxtareaStartCount, document.getElementsByClassName('widget-post-insert-code'));
+						if(teaxtareaStartCount < document.getElementsByClassName('widget-post-insert-code').length){
+							initNewWidgetInsertCode();
+						} else { // waiting load
+							setTimeout(function(){
+								checkAppendNewTextarea();
+							}, 200);
+						}
+					}
+
 				}
 			};
 		}
 
 		// Прячем показанные кнопки выйдя за границы контейнера
 		const vBox = document.getElementsByClassName("js-cssMe-vis-box");
+
 		for (let i = 0; i < vBox.length; i++) {
 			vBox[i].onmouseleave = function () {
 				vBox[i].classList.add("hide");
 			}
 		}
 
-		// Клик по кнопке "мобильный"
+		// Клик по кнопкам "мобильный/таблет/десктоп"
 		const mBtn = document.querySelectorAll('[class*="js-cssMe__vis-"]');
+
 		for (let i = 0; i < mBtn.length; i++) {
 			mBtn[i].onclick = function () {
 				if (hasClass(mBtn[i], 'is-active')) {
@@ -192,7 +231,7 @@ window.onload = function () {
 
 			if(addController){ // Добавление
 				if(cssMeTextarea.value === ''){ // Первичная генерация
-					cssMeTextarea.value = '<style>\/*cssMePlease*\/\n' + generatedText + '</style>';
+					firstTeaxtareaValueGenegate(generatedText); // Добавляем метку и первый стиль
 				} else { // К старому добавляем новый
 					const textMassiv = cssMeTextarea.value.split('</style>');
 
@@ -206,10 +245,15 @@ window.onload = function () {
 			document.dispatchEvent(new CustomEvent('updateInsertCode', {
 				bubbles: true,
 				detail: {
-					textarea_id: cssMeTextarea.id
+					textarea_id: 'element_' + cssMeTextarea.id.split('_')[1]
 				}
 			}));
 
+		}
+
+		// Генерация метки и текста, если он есть
+		function firstTeaxtareaValueGenegate(generatedText) {
+			cssMeTextarea.value = '<style>\/*cssMePlease*\/\n' + generatedText + '</style>';
 		}
 
 	}
